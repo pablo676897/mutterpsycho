@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MutterPsycho – Pszichológia záróvizsgára</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#a560e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MutterPsycho">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#3c3c3c;--muted:#777;--line:#e5e5e5;--soft:#f7f7f7;--green:#58cc02;--green-d:#46a302;--red:#ff4b4b;--red-d:#ea2b2b;--blue:#1cb0f6;--blue-d:#1899d6;--gold:#ffc800;--okbg:#d7ffb8;--badbg:#ffdfe0;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:Nunito,system-ui,sans-serif;font-weight:700}
+button{font-family:inherit;font-weight:800;cursor:pointer}
+#app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:2px solid var(--line)}
+.brand{font-weight:900;font-size:20px;color:#a560e8;letter-spacing:-.3px}
+.stats{display:flex;gap:14px;font-size:16px}
+.stat{display:flex;align-items:center;gap:4px}
+.stat svg{width:22px;height:22px}
+.main{flex:1;padding:16px 16px 100px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:2px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+.nav .in{max-width:560px;width:100%;display:flex}
+.nav button{flex:1;background:none;border:0;padding:10px 0 12px;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;text-transform:uppercase;letter-spacing:.5px}
+.nav button.on{color:var(--blue)}
+.nav svg{width:26px;height:26px}
+.goal{border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.goal .bar{flex:1}
+.bar{height:14px;background:var(--line);border-radius:10px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--gold);border-radius:10px;transition:width .4s}
+.unit-h{border-radius:16px;color:#fff;padding:14px 16px;margin:22px 0 8px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.unit-h small{display:block;opacity:.9;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.unit-h b{font-size:19px;font-weight:900}
+.unit-h p{margin:2px 0 0;font-size:14px;opacity:.95}
+.path{display:flex;flex-direction:column;align-items:center;gap:22px;padding:40px 0 12px}
+.node{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
+.node button.circle{width:72px;height:66px;border-radius:50%;border:0;color:#fff;font-size:26px;display:grid;place-items:center;box-shadow:0 6px 0 rgba(0,0,0,.22);transition:transform .08s}
+.node button.circle:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+.node button.circle svg{width:32px;height:32px}
+.node.locked button.circle{background:#e5e5e5!important;box-shadow:0 6px 0 #c9c9c9;color:#afafaf}
+.node .lbl{font-size:13px;color:var(--muted);text-align:center;max-width:160px}
+.node.cur .lbl{color:var(--fg)}
+.crown{position:absolute;top:-6px;right:-10px;background:var(--gold);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;border:2px solid #fff}
+.start-tip{position:absolute;top:-38px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:5px 10px;font-size:13px;color:var(--green);white-space:nowrap;animation:bob 1.4s infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font-size:16px;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--green);box-shadow:0 4px 0 var(--green-d)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-d)}
+.btn.blue{background:var(--blue);box-shadow:0 4px 0 var(--blue-d)}
+.btn.red{background:var(--red);box-shadow:0 4px 0 var(--red-d)}
+.btn.ghost{background:#fff;color:var(--blue);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn:disabled{background:#e5e5e5;color:#afafaf;box-shadow:0 4px 0 #ccc;cursor:default}
+.card{border:2px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 6px;font-size:18px;font-weight:900}
+.card p{margin:0 0 12px;color:var(--muted);font-weight:600}
+h2{font-weight:900;font-size:22px;margin:6px 0 14px}
+/* lesson */
+.lesson{position:fixed;inset:0;background:#fff;z-index:20;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.lesson .in{max-width:560px;width:100%;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:0}
+.lhead{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.x{background:none;border:0;color:#afafaf;font-size:26px;line-height:1;padding:0 4px}
+.lhead .bar{flex:1;height:16px}
+.lhead .bar>i{background:var(--green)}
+.lbody{flex:1;overflow-y:auto;padding:8px 18px 20px}
+.qtype{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);margin-bottom:6px}
+.qtext{font-size:21px;font-weight:800;line-height:1.35;margin:0 0 20px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 16px;font-size:16px;font-weight:700;color:var(--fg);box-shadow:0 3px 0 var(--line)}
+.opt.sel{border-color:#84d8ff;background:#ddf4ff;color:var(--blue-d);box-shadow:0 3px 0 #84d8ff}
+.opt.ok{border-color:var(--green);background:var(--okbg);color:var(--green-d);box-shadow:0 3px 0 var(--green)}
+.opt.bad{border-color:var(--red);background:var(--badbg);color:var(--red-d);box-shadow:0 3px 0 var(--red);animation:shake .3s}
+.opt.done{opacity:.35;border-color:var(--line);background:var(--soft);box-shadow:none}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tf{flex-direction:row}.tf .opt{flex:1;text-align:center;font-size:18px}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.match .col{display:flex;flex-direction:column;gap:10px}
+.match .opt{font-size:14px;padding:12px;min-height:56px;text-align:center;display:flex;align-items:center;justify-content:center}
+.inp{width:100%;font:inherit;font-size:20px;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:var(--soft);outline:none}
+.inp:focus{border-color:#84d8ff;background:#fff}
+.unit-note{color:var(--muted);font-size:14px;margin-top:8px}
+.ord-slots{min-height:64px;border-bottom:2px solid var(--line);padding-bottom:12px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+.ord-slots .opt{display:flex;gap:10px;align-items:center}
+.ord-slots .n{background:var(--blue);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:13px;flex:none}
+.ord-pool{display:flex;flex-wrap:wrap;gap:8px}
+.ord-pool .opt{padding:10px 12px;font-size:15px}
+.lfoot{border-top:2px solid var(--line);padding:16px 18px calc(16px + env(safe-area-inset-bottom))}
+.lfoot.ok{background:var(--okbg);border-color:transparent}
+.lfoot.bad{background:var(--badbg);border-color:transparent}
+.fb-t{font-size:20px;font-weight:900;margin-bottom:4px}
+.lfoot.ok .fb-t{color:var(--green-d)} .lfoot.bad .fb-t{color:var(--red-d)}
+.fb-a{font-size:15px;margin-bottom:4px}
+.lfoot.bad .fb-a{color:var(--red-d)}
+.fb-e{font-size:14px;color:#4b4b4b;font-weight:600;margin-bottom:12px;max-height:30vh;overflow:auto}
+.theory{background:var(--soft);border-radius:18px;padding:18px;font-size:16px;line-height:1.55;font-weight:600}
+.theory h3{margin:0 0 10px;font-size:20px;font-weight:900;color:var(--fg)}
+.theory b{font-weight:900}
+.tdots{display:flex;gap:6px;justify-content:center;margin:14px 0}
+.tdots i{width:8px;height:8px;border-radius:50%;background:var(--line)} .tdots i.on{background:var(--blue)}
+.center{text-align:center}
+.big{font-size:64px;margin:20px 0 4px}
+.res{display:flex;gap:10px;margin:20px 0}
+.res div{flex:1;border:2px solid var(--gold);border-radius:14px;overflow:hidden}
+.res div:nth-child(2){border-color:var(--green)}
+.res small{display:block;background:var(--gold);color:#fff;padding:4px;font-size:12px;text-transform:uppercase}
+.res div:nth-child(2) small{background:var(--green)}
+.res b{display:block;padding:10px;font-size:22px;font-weight:900}
+.prow{display:flex;justify-content:space-between;align-items:center;font-size:15px;margin:10px 0 4px}
+.prow span{color:var(--muted)}
+.ubar .bar>i{background:var(--green)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.statgrid div{border:2px solid var(--line);border-radius:14px;padding:12px}
+.statgrid b{display:block;font-size:22px;font-weight:900}
+.statgrid span{color:var(--muted);font-size:13px}
+.sync{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;margin:8px 0 16px}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc}.dot.on{background:var(--green)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.modal .sheet{background:#fff;border-radius:22px 22px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));max-width:560px;width:100%}
+.modal .sheet .btn{margin-top:10px}
+.hearts-row{display:flex;justify-content:center;gap:6px;margin:10px 0}
+.hearts-row svg{width:30px;height:30px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+.confetti i{position:absolute;top:-10px;width:9px;height:14px;border-radius:2px;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.7}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="content.js"></script>
+<script>
+(function(){
+"use strict";
+const UNITS=window.UNITS||[];
+const MAXH=5, REGEN=30*60*1000, GOAL=50;
+const ICON={
+ fire:'<svg viewBox="0 0 24 24"><path fill="#ff9600" d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z"/><path fill="#ffc800" d="M12 13c1 2 3 3 3 5a3 3 0 0 1-6 0c0-1.5 1-2.5 1.5-3 .2 1 .8 1.5 1.5 1.5 0-1.5-.5-2.5 0-3.5z"/></svg>',
+ fireOff:'<svg viewBox="0 0 24 24"><path fill="#ccc" d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z"/></svg>',
+ gem:'<svg viewBox="0 0 24 24"><path fill="#ffc800" d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24"><path fill="#ff4b4b" d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg>',
+ heartOff:'<svg viewBox="0 0 24 24"><path fill="#e5e5e5" d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg>',
+ star:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8z"/></svg>',
+ check:'<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+ lock:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>',
+ learn:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10z"/></svg>',
+ practice:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>',
+ profile:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5" fill="currentColor"/><path fill="currentColor" d="M3.5 21a8.5 8.5 0 0 1 17 0z"/></svg>',
+ book:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h6a3 3 0 0 1 2 1 3 3 0 0 1 2-1h6v15h-6a2 2 0 0 0-2 1 2 2 0 0 0-2-1H4z"/></svg>'
+};
+// ---------- content index ----------
+const LESSONS=[]; const Q={};
+UNITS.forEach((u,ui)=>u.lessons.forEach((l,li)=>{l.unit=u;l.ui=ui;l.li=li;l.idx=LESSONS.length;LESSONS.push(l);l.qs.forEach((q,qi)=>{q.id=l.id+"-"+qi;q.lesson=l;Q[q.id]=q;});}));
+// ---------- state ----------
+const LSKEY="mutterpsycho-progress-v1";
+function blank(){return {xp:0,hearts:MAXH,heartTs:Date.now(),streak:0,lastDay:"",dayXp:0,xpDay:"",done:{},mistakes:{},answered:0,correct:0,updatedAt:0};}
+let S=blank();
+try{const c=JSON.parse(localStorage.getItem(LSKEY)||"null");if(c&&typeof c==="object")S=Object.assign(blank(),c);}catch(e){}
+let db=null, docRef=null, synced=false, writing=false, pending=false, saveTimer=null;
+function today(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return today(d);}
+function refreshHearts(){
+ if(S.hearts>=MAXH){S.hearts=MAXH;return;}
+ const n=Math.floor((Date.now()-S.heartTs)/REGEN);
+ if(n>0){S.hearts=Math.min(MAXH,S.hearts+n);S.heartTs+=n*REGEN;if(S.hearts>=MAXH)S.heartTs=Date.now();}
+}
+function curStreak(){return (S.lastDay===today()||S.lastDay===yesterday())?S.streak:0;}
+function dayXp(){return S.xpDay===today()?S.dayXp:0;}
+function addXp(n){if(S.xpDay!==today()){S.xpDay=today();S.dayXp=0;}S.dayXp+=n;S.xp+=n;}
+function bumpStreak(){const t=today();if(S.lastDay===t)return;S.streak=(S.lastDay===yesterday())?S.streak+1:1;S.lastDay=t;}
+function loseHeart(){if(S.hearts>=MAXH)S.heartTs=Date.now();S.hearts=Math.max(0,S.hearts-1);}
+function save(){
+ S.updatedAt=Date.now();
+ try{localStorage.setItem(LSKEY,JSON.stringify(S));}catch(e){}
+ if(!docRef)return;
+ clearTimeout(saveTimer);saveTimer=setTimeout(flush,1200);
+}
+async function flush(){
+ if(!docRef)return;
+ if(writing){pending=true;return;}
+ writing=true;
+ try{await docRef.set(JSON.parse(JSON.stringify(S)));synced=true;}
+ catch(e){if(e&&e.code==="unavailable"){setTimeout(flush,1500+Math.random()*1500);}else if(e&&(e.code==="invalid_argument"||e.code==="revoked")){docRef=null;synced=false;}}
+ writing=false;
+ if(pending){pending=false;flush();}
+ if(view==="profile")render();
+}
+async function initSync(){
+ try{
+  if(!window.claude||!window.claude.use)return;
+  const [d,u]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+  if(!d||!u)return;
+  const id=await u.id(); if(!id)return;
+  db=d; docRef=db.doc("data/users/"+id+"/progress");
+  const snap=await Promise.race([docRef.get(),new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),10000))]);
+  if(snap.exists){
+   const r=snap.data()||{};
+   if((r.updatedAt||0)>(S.updatedAt||0)){S=Object.assign(blank(),JSON.parse(JSON.stringify(r)));try{localStorage.setItem(LSKEY,JSON.stringify(S));}catch(e){}}
+   else if((S.updatedAt||0)>(r.updatedAt||0)){flush();}
+   synced=true;
+  } else if(S.updatedAt){flush();} else {synced=true;}
+  if(!lessonState)render();
+ }catch(e){ if(!docRef)return; }
+}
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function unlocked(l){return l.idx===0||!!S.done[LESSONS[l.idx-1].id];}
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[.,;:!?„”"']/g,"").replace(/\s+/g," ").trim();}
+// ---------- views ----------
+let view="learn"; let lessonState=null;
+function topbar(){
+ refreshHearts();
+ const st=curStreak();
+ return `<div class="top"><div class="brand">MutterPsycho</div><div class="stats">
+ <div class="stat" title="Napi sorozat">${st?ICON.fire:ICON.fireOff}<span style="color:${st?"#ff9600":"#afafaf"}">${st}</span></div>
+ <div class="stat" title="XP">${ICON.gem}<span style="color:#e6a800">${S.xp}</span></div>
+ <div class="stat" title="Szívek" data-act="hearts">${ICON.heart}<span style="color:var(--red)">${S.hearts}</span></div></div></div>`;
+}
+function navbar(){
+ const b=(v,ic,t)=>`<button class="${view===v?"on":""}" data-nav="${v}">${ICON[ic]}${t}</button>`;
+ return `<nav class="nav"><div class="in">${b("learn","learn","Tanulás")}${b("practice","practice","Gyakorlás")}${b("profile","profile","Profil")}</div></nav>`;
+}
+function learnView(){
+ const dx=dayXp();
+ let h=`<div class="goal">${ICON.gem.replace("<svg","<svg style='width:30px;height:30px;flex:none'")}<div style="flex:1"><div style="font-size:14px;margin-bottom:6px">Napi cél · ${Math.min(dx,GOAL)}/${GOAL} XP</div><div class="bar"><i style="width:${Math.min(100,dx/GOAL*100)}%"></i></div></div></div>`;
+ const next=LESSONS.find(l=>!S.done[l.id]);
+ UNITS.forEach((u,ui)=>{
+  h+=`<div class="unit-h" style="background:${u.color}"><small>${ui+1}. egység</small><b>${esc(u.title)}</b><p>${esc(u.desc)}</p></div><div class="path">`;
+  u.lessons.forEach((l,li)=>{
+   const ok=unlocked(l), done=S.done[l.id], cur=next&&next.id===l.id;
+   const off=[0,60,-60,40,-40][li%5];
+   h+=`<div class="node ${ok?"":"locked"} ${cur?"cur":""}" style="transform:translateX(${off}px)">
+    ${cur?`<div class="start-tip">KEZDÉS</div>`:""}
+    <button class="circle" style="background:${u.color}" data-lesson="${l.id}" aria-label="${esc(l.title)}">${done?ICON.check:ok?ICON.star:ICON.lock}</button>
+    ${done&&done.perfect?`<span class="crown">HIBÁTLAN</span>`:""}
+    <div class="lbl">${esc(l.title)}</div></div>`;
+  });
+  h+=`</div>`;
+ });
+ return h;
+}
+function practiceView(){
+ const mk=Object.keys(S.mistakes).filter(k=>Q[k]);
+ const doneQs=LESSONS.filter(l=>S.done[l.id]).reduce((a,l)=>a+l.qs.length,0);
+ refreshHearts();
+ let wait="";
+ if(S.hearts<MAXH){const ms=REGEN-((Date.now()-S.heartTs)%REGEN);wait=`Következő szív ${Math.ceil(ms/60000)} perc múlva.`;}
+ return `<h2>Gyakorlás</h2>
+ <div class="card"><h3>Hibák javítása</h3><p>${mk.length?`${mk.length} rosszul megválaszolt kérdés. Válaszold meg mindet helyesen, hogy eltűnjenek. Nem veszítesz szívet, a végén +1 szív.`:"Még nincs mentett hibád – ide kerülnek, ha valamit elrontasz."}</p>
+ <button class="btn red" data-act="mistakes" ${mk.length?"":"disabled"}>${mk.length||""} hiba átnézése</button></div>
+ <div class="card"><h3>Vegyes ismétlés</h3><p>${doneQs?"10 véletlen kérdés a befejezett leckékből. Nem veszítesz szívet, a végén +1 szív.":"Előbb fejezz be egy leckét."}</p>
+ <button class="btn blue" data-act="mixed" ${doneQs?"":"disabled"}>Ismétlés indítása</button></div>
+ <div class="card"><h3>Szívek</h3><div class="hearts-row">${Array.from({length:MAXH},(_,i)=>i<S.hearts?ICON.heart:ICON.heartOff).join("")}</div><p class="center" style="margin:0">${S.hearts<MAXH?`Leckében minden rossz válasz egy szívbe kerül. ${wait}`:"Tele vagy szívvel! Leckében minden rossz válasz egybe kerül."}</p></div>`;
+}
+function profileView(){
+ const doneN=Object.keys(S.done).filter(k=>LESSONS.some(l=>l.id===k)).length;
+ const acc=S.answered?Math.round(S.correct/S.answered*100):0;
+ let h=`<h2>Haladásod</h2>
+ <div class="sync"><span class="dot ${docRef&&synced?"on":""}"></span>${docRef?(synced?"Szinkronizálva az eszközeid között":"Szinkronizálás…"):"Ezen az eszközön mentve"}</div>
+ <div class="statgrid"><div><b>${curStreak()}</b><span>Napi sorozat</span></div><div><b>${S.xp}</b><span>Összes XP</span></div>
+ <div><b>${doneN}/${LESSONS.length}</b><span>Kész leckék</span></div><div><b>${acc}%</b><span>Pontosság</span></div></div>
+ <div class="card ubar"><h3>Egységek</h3>`;
+ UNITS.forEach(u=>{const d=u.lessons.filter(l=>S.done[l.id]).length;h+=`<div class="prow">${esc(u.title)}<span>${d}/${u.lessons.length}</span></div><div class="bar"><i style="width:${d/u.lessons.length*100}%;background:${u.color}"></i></div>`;});
+ h+=`</div><button class="btn ghost" data-act="reset">Haladás törlése</button>`;
+ return h;
+}
+function render(){
+ if(lessonState)return renderLesson();
+ const app=$("#app");
+ const body=view==="learn"?learnView():view==="practice"?practiceView():profileView();
+ app.innerHTML=topbar()+`<div class="main">${body}</div>`+navbar();
+ if(view==="learn"){const c=document.querySelector(".node.cur");if(c&&!render.scrolled){render.scrolled=true;setTimeout(()=>c.scrollIntoView({block:"center"}),50);}}
+}
+// ---------- modal ----------
+function modal(html){const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="sheet">${html}</div>`;m.addEventListener("click",e=>{if(e.target===m)m.remove();});document.body.appendChild(m);return m;}
+// ---------- lessons ----------
+function startLesson(l){
+ refreshHearts();
+ if(S.hearts<=0){outOfHearts();return;}
+ lessonState={mode:"lesson",lesson:l,theory:l.theory,tIdx:0,phase:l.theory.length?"theory":"q",queue:shuffle(l.qs),total:l.qs.length,cleared:0,mistakes:0,xp:0,firstTry:new Set()};
+ newQ();render();
+}
+function startPractice(kind){
+ let qs;
+ if(kind==="mistakes")qs=shuffle(Object.keys(S.mistakes).filter(k=>Q[k]).map(k=>Q[k])).slice(0,15);
+ else qs=shuffle(LESSONS.filter(l=>S.done[l.id]).flatMap(l=>l.qs)).slice(0,10);
+ if(!qs.length)return;
+ lessonState={mode:kind,lesson:null,theory:[],tIdx:0,phase:"q",queue:qs,total:qs.length,cleared:0,mistakes:0,xp:0,firstTry:new Set()};
+ newQ();render();
+}
+function newQ(){
+ const L=lessonState;const q=L.queue[0];if(!q)return;
+ L.cur={q,checked:false,ok:null,sel:null,input:"",order:[],pool:q.t==="order"?shuffle(q.items.map((x,i)=>i)):[],
+  opts:q.t==="mc"?shuffle(q.o.map((x,i)=>i)):[],
+  left:q.t==="match"?shuffle(q.pairs.map((x,i)=>i)):[],right:q.t==="match"?shuffle(q.pairs.map((x,i)=>i)):[],mL:null,matched:new Set(),badFlash:null,erred:false};
+ if(L.cur.q.t==="order"&&L.cur.pool.every((v,i)=>v===i)&&L.cur.pool.length>1)L.cur.pool.reverse();
+}
+function answerText(q){
+ if(q.t==="mc")return q.o[q.a];
+ if(q.t==="tf")return q.a?"Igaz":"Hamis";
+ if(q.t==="num")return String(q.a)+(q.unit?" "+q.unit:"");
+ if(q.t==="fill")return esc(q.a[0]);
+ if(q.t==="order")return q.items.map(esc).join(" → ");
+ if(q.t==="match")return q.pairs.map(p=>esc(p[0])+" = "+esc(p[1])).join("<br>");
+ return "";
+}
+function canCheck(){
+ const c=lessonState.cur,q=c.q;
+ if(q.t==="mc"||q.t==="tf")return c.sel!==null;
+ if(q.t==="num"||q.t==="fill")return c.input.trim()!=="";
+ if(q.t==="order")return c.order.length===q.items.length;
+ return false;
+}
+function check(){
+ const L=lessonState,c=L.cur,q=c.q;let ok=false;
+ if(q.t==="mc")ok=c.sel===q.a;
+ else if(q.t==="tf")ok=c.sel===q.a;
+ else if(q.t==="num"){const v=parseFloat(c.input.replace(/\s/g,"").replace(",","."));ok=!isNaN(v)&&Math.abs(v-q.a)<=(q.tol||0);}
+ else if(q.t==="fill")ok=q.a.some(a=>norm(a)===norm(c.input)||norm(a).replace(/\s/g,"")===norm(c.input).replace(/\s/g,""));
+ else if(q.t==="order")ok=c.order.every((v,i)=>v===i);
+ else if(q.t==="match")ok=!c.erred;
+ grade(ok);
+}
+function grade(ok){
+ const L=lessonState,c=L.cur,q=c.q;
+ c.checked=true;c.ok=ok;S.answered++;
+ if(ok){S.correct++;L.xp+=2;if(L.mode==="mistakes"){delete S.mistakes[q.id];}}
+ else{L.mistakes++;S.mistakes[q.id]=(S.mistakes[q.id]||0)+1;if(L.mode==="lesson")loseHeart();}
+ save();render();
+}
+function cont(){
+ const L=lessonState,c=L.cur;
+ const q=L.queue.shift();
+ if(c.ok){L.cleared++;}
+ else{L.queue.push(q);}
+ if(L.mode==="lesson"&&S.hearts<=0&&!c.ok){lessonState=null;render();outOfHearts(true);return;}
+ if(!L.queue.length){finish();return;}
+ newQ();render();
+}
+function finish(){
+ const L=lessonState;let bonus=0;
+ if(L.mode==="lesson"){
+  const perfect=L.mistakes===0;bonus=10+(perfect?5:0);
+  const prev=S.done[L.lesson.id];
+  S.done[L.lesson.id]={perfect:perfect||(prev&&prev.perfect)||false,t:Date.now()};
+ } else {bonus=5;refreshHearts();if(S.hearts<MAXH){S.hearts++;if(S.hearts>=MAXH)S.heartTs=Date.now();}}
+ L.xp+=bonus;addXp(L.xp);bumpStreak();save();
+ L.phase="done";render();confetti();
+}
+function confetti(){const c=document.createElement("div");c.className="confetti";const cols=["#58cc02","#1cb0f6","#ffc800","#ff4b4b","#ce82ff"];for(let i=0;i<40;i++){const p=document.createElement("i");p.style.left=Math.random()*100+"%";p.style.background=cols[i%5];p.style.animationDelay=Math.random()*.6+"s";c.appendChild(p);}document.body.appendChild(c);setTimeout(()=>c.remove(),2800);}
+function outOfHearts(mid){
+ refreshHearts();const ms=REGEN-((Date.now()-S.heartTs)%REGEN);
+ const m=modal(`<div class="center"><div class="hearts-row">${Array.from({length:MAXH},()=>ICON.heartOff).join("")}</div><h2 style="margin:6px 0">${mid?"Elfogytak a szíveid!":"Nincs több szíved"}</h2><p style="color:var(--muted);font-weight:600">Következő szív ${Math.ceil(ms/60000)} perc múlva. Gyakorlással azonnal visszaszerezhetsz.</p></div>
+ <button class="btn blue" data-m="practice">Gyakorlás szívekért</button><button class="btn ghost" data-m="close">Bezárás</button>`);
+ m.addEventListener("click",e=>{const a=e.target.closest("[data-m]");if(!a)return;m.remove();if(a.dataset.m==="practice"){view="practice";render();}});
+}
+function renderLesson(){
+ const L=lessonState,app=$("#app");
+ const pct=L.phase==="done"?100:L.phase==="theory"?0:(L.cleared/L.total*100);
+ let head=`<div class="lhead"><button class="x" data-l="quit" aria-label="Kilépés">✕</button><div class="bar"><i style="width:${pct}%"></i></div>${L.mode==="lesson"?`<div class="stat">${ICON.heart}<span style="color:var(--red)">${S.hearts}</span></div>`:""}</div>`;
+ let body="",foot="";
+ if(L.phase==="theory"){
+  const t=L.theory[L.tIdx];
+  body=`<div class="qtype">${ICON.book.replace("<svg","<svg style='width:16px;height:16px;vertical-align:-3px'")} Elmélet</div><div class="theory"><h3>${t[0]}</h3>${t[1]}</div><div class="tdots">${L.theory.map((_,i)=>`<i class="${i===L.tIdx?"on":""}"></i>`).join("")}</div>`;
+  foot=`<div class="lfoot"><button class="btn" data-l="tnext">${L.tIdx<L.theory.length-1?"Tovább":"Kérdések indítása"}</button></div>`;
+ } else if(L.phase==="done"){
+  const acc=Math.round(L.total/(L.total+L.mistakes)*100);
+  body=`<div class="center"><div class="big">${L.mistakes===0?"🏆":"🎉"}</div><h2>${L.mode==="lesson"?(L.mistakes===0?"Hibátlan lecke!":"Lecke kész!"):"Gyakorlás kész!"}</h2>
+  <p style="color:var(--muted);font-weight:600">${L.mode==="lesson"?esc(L.lesson.title):"+1 szív visszatöltve"}</p>
+  <div class="res"><div><small>Szerzett XP</small><b>+${L.xp}</b></div><div><small>Pontosság</small><b>${acc}%</b></div></div></div>`;
+  foot=`<div class="lfoot"><button class="btn" data-l="exit">Tovább</button></div>`;
+ } else {
+  const c=L.cur,q=c.q;
+  const label={mc:"Válaszd ki a helyeset",tf:"Igaz vagy hamis?",match:"Párosítsd össze",num:"Számold ki",fill:"Írd be a választ",order:"Tedd sorrendbe"}[q.t];
+  body=`<div class="qtype">${L.mode!=="lesson"&&q.lesson?esc(q.lesson.title)+" · ":""}${label}</div><p class="qtext">${q.q}</p>`;
+  if(q.t==="mc"){
+   body+=`<div class="opts">${c.opts.map(i=>{let cl="";if(c.checked){if(i===q.a)cl="ok";else if(i===c.sel)cl="bad";}else if(i===c.sel)cl="sel";return `<button class="opt ${cl}" data-o="${i}" ${c.checked?"disabled":""}>${q.o[i]}</button>`;}).join("")}</div>`;
+  } else if(q.t==="tf"){
+   body+=`<div class="opts tf">${[true,false].map(v=>{let cl="";if(c.checked){if(v===q.a)cl="ok";else if(v===c.sel)cl="bad";}else if(v===c.sel)cl="sel";return `<button class="opt ${cl}" data-tf="${v}" ${c.checked?"disabled":""}>${v?"Igaz":"Hamis"}</button>`;}).join("")}</div>`;
+  } else if(q.t==="match"){
+   const col=(arr,side)=>arr.map(i=>{const done=c.matched.has(i);let cl=done?"done":"";if(!done&&side==="l"&&c.mL===i)cl="sel";if(c.badFlash&&c.badFlash[side]===i)cl="bad";return `<button class="opt ${cl}" data-m${side}="${i}" ${done||c.checked?"disabled":""}>${esc(q.pairs[i][side==="l"?0:1])}</button>`;}).join("");
+   body+=`<div class="match"><div class="col">${col(c.left,"l")}</div><div class="col">${col(c.right,"r")}</div></div>`;
+  } else if(q.t==="num"||q.t==="fill"){
+   body+=`<input class="inp" id="ans" ${q.t==="num"?'inputmode="decimal"':'autocapitalize="off" autocomplete="off" spellcheck="false"'} placeholder="${q.t==="num"?"Szám":"Válaszod"}" value="${esc(c.input)}" ${c.checked?"disabled":""}>${q.t==="num"&&q.tol?`<div class="unit-note">±${q.tol} eltérés elfogadott.</div>`:""}`;
+  } else if(q.t==="order"){
+   body+=`<div class="ord-slots">${c.order.map((i,k)=>`<button class="opt ${c.checked?(i===k?"ok":"bad"):""}" data-ou="${k}" ${c.checked?"disabled":""}><span class="n">${k+1}</span>${esc(q.items[i])}</button>`).join("")||`<div style="color:#afafaf;font-size:14px;padding:18px 0">Koppints az elemekre sorrendben</div>`}</div>
+   <div class="ord-pool">${c.pool.filter(i=>!c.order.includes(i)).map(i=>`<button class="opt" data-op="${i}" ${c.checked?"disabled":""}>${esc(q.items[i])}</button>`).join("")}</div>`;
+  }
+  if(c.checked){
+   foot=`<div class="lfoot ${c.ok?"ok":"bad"}"><div class="fb-t">${c.ok?["Szép!","Helyes!","Nagyon jó!","Pontosan!"][Math.floor(Math.random()*4)]:"Nem egészen"}</div>${c.ok?"":`<div class="fb-a"><b>Helyes válasz:</b><br>${answerText(q)}</div>`}<div class="fb-e">${q.e||""}</div><button class="btn ${c.ok?"":"red"}" data-l="cont">Tovább</button></div>`;
+  } else if(q.t==="match"){
+   foot=`<div class="lfoot"><button class="btn" disabled>Párosíts mindent</button></div>`;
+  } else {
+   foot=`<div class="lfoot"><button class="btn" data-l="check" ${canCheck()?"":"disabled"}>Ellenőrzés</button></div>`;
+  }
+ }
+ app.innerHTML=`<div class="lesson"><div class="in">${head}<div class="lbody">${body}</div>${foot}</div></div>`;
+ const inp=$("#ans");
+ if(inp&&!lessonState.cur.checked){inp.addEventListener("input",()=>{lessonState.cur.input=inp.value;const b=document.querySelector('[data-l="check"]');if(b)b.disabled=!canCheck();});
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&canCheck())check();});
+  if(!matchMedia("(pointer:coarse)").matches)inp.focus();}
+}
+// ---------- events ----------
+document.addEventListener("click",e=>{
+ const t=e.target.closest("button,[data-act]");if(!t)return;
+ if(t.dataset.nav){view=t.dataset.nav;render();window.scrollTo(0,0);return;}
+ if(t.dataset.lesson){const l=LESSONS.find(x=>x.id===t.dataset.lesson);if(!unlocked(l)){const p=LESSONS[l.idx-1];const m=modal(`<h2 style="margin-top:0">Zárolva</h2><p style="color:var(--muted);font-weight:600">Előbb fejezd be: „${esc(p.title)}”.</p><button class="btn" data-m="x">OK</button>`);m.querySelector("[data-m]").onclick=()=>m.remove();return;}
+  const done=S.done[l.id];
+  const m=modal(`<div style="color:${l.unit.color};font-size:13px;text-transform:uppercase;letter-spacing:.6px">${l.ui+1}. egység · ${l.li+1}. lecke</div><h2 style="margin:4px 0 4px">${esc(l.title)}</h2><p style="color:var(--muted);font-weight:600;margin:0 0 8px">${l.theory.length} elméleti kártya · ${l.qs.length} kérdés${done?" · kész":""}</p><button class="btn" data-m="go">${done?"Újra gyakorlom +XP":"Lecke indítása"}</button>`);
+  m.querySelector("[data-m]").onclick=()=>{m.remove();startLesson(l);};return;}
+ const act=t.dataset.act;
+ if(act==="mistakes"||act==="mixed"){startPractice(act);return;}
+ if(act==="hearts"){view="practice";render();return;}
+ if(act==="reset"){const m=modal(`<h2 style="margin-top:0">Törlöd a teljes haladást?</h2><p style="color:var(--muted);font-weight:600">Az XP, a sorozat, a kész leckék és a hibák törlődnek.</p><button class="btn red" data-m="y">Törlés</button><button class="btn ghost" data-m="n">Mégse</button>`);
+  m.addEventListener("click",ev=>{const b=ev.target.closest("[data-m]");if(!b)return;m.remove();if(b.dataset.m==="y"){S=blank();save();render();}});return;}
+ if(!lessonState)return;
+ const L=lessonState,c=L.cur;
+ const l=t.dataset.l;
+ if(l==="quit"){if(L.phase==="done"){lessonState=null;render();return;}const m=modal(`<h2 style="margin-top:0">Kilépsz?</h2><p style="color:var(--muted);font-weight:600">Elveszik a lecke eddigi haladása.</p><button class="btn" data-m="n">Tanulok tovább</button><button class="btn ghost" data-m="y" style="color:var(--red)">Kilépés</button>`);
+  m.addEventListener("click",ev=>{const b=ev.target.closest("[data-m]");if(!b)return;m.remove();if(b.dataset.m==="y"){lessonState=null;render();}});return;}
+ if(l==="tnext"){if(L.tIdx<L.theory.length-1)L.tIdx++;else L.phase="q";render();return;}
+ if(l==="exit"){lessonState=null;render();return;}
+ if(l==="check"){if(canCheck())check();return;}
+ if(l==="cont"){cont();return;}
+ if(!c||c.checked)return;
+ if(t.dataset.o!==undefined){c.sel=+t.dataset.o;render();return;}
+ if(t.dataset.tf!==undefined){c.sel=t.dataset.tf==="true";render();return;}
+ if(t.dataset.op!==undefined){c.order.push(+t.dataset.op);render();return;}
+ if(t.dataset.ou!==undefined){c.order.splice(+t.dataset.ou,1);render();return;}
+ if(t.dataset.ml!==undefined){c.mL=+t.dataset.ml;render();return;}
+ if(t.dataset.mr!==undefined){
+  if(c.mL===null)return;const r=+t.dataset.mr;
+  if(r===c.mL){c.matched.add(r);c.mL=null;
+   if(c.matched.size===c.q.pairs.length){render();setTimeout(()=>grade(!c.erred),250);return;}
+  } else {c.erred=true;c.badFlash={l:c.mL,r};const keep=c;setTimeout(()=>{if(keep.badFlash){keep.badFlash=null;if(lessonState&&lessonState.cur===keep)render();}},450);c.mL=null;}
+  render();return;}
+});
+setInterval(()=>{if(!lessonState){const h=S.hearts;refreshHearts();if(h!==S.hearts){save();render();}}},60000);
+render();
+initSync();
+if("serviceWorker" in navigator&&location.protocol!=="file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+})();
+</script>
+</body>
+</html>

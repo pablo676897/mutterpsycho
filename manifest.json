@@ -1,0 +1,17 @@
+{
+  "name": "MutterPsycho – Pszichológia",
+  "short_name": "MutterPsycho",
+  "description": "Duolingo-stílusú leckék a klinikai és egészségpszichológia záróvizsgához.",
+  "lang": "hu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#a560e8",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
